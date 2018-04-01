@@ -36,7 +36,10 @@ public class Critter1 extends Critter {
 
     @Override
     public void doTimeStep() {
+        lookDuringTimeStep = true;
+        String occupant = look(direction, true);                  // ??
     	run(direction);
+    	lookDuringTimeStep = false;
         Critter1 offspring = new Critter1();
         reproduce(offspring, getRandomInt(8));
     }
@@ -48,6 +51,7 @@ public class Critter1 extends Critter {
        }
         else {
            tryingToFlee = true;
+           String occupant = look(4, true);                  // ??
            walk(4);//move back in the herd
            return false;
        }

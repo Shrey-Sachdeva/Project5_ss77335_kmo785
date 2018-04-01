@@ -66,7 +66,9 @@ public class Critter3 extends Critter {
     @Override
     // Do they move down?
     public void doTimeStep() {
+        lookDuringTimeStep = true;
         if(rightMoves > 0) {
+            String occupant = look(RIGHT, true);               // ??
             rightMoves--;
             walk(RIGHT);
         }
@@ -75,14 +77,17 @@ public class Critter3 extends Critter {
                 Critter3 offspring  = new Critter3(right, down+1, left, up+1);
                 reproduce(offspring, RIGHT);
             }
+            String occupant = look(DOWN, true);                // ??
             downMoves--;
             walk(DOWN);
         }
         else if(leftMoves > 0) {
+            String occupant = look(LEFT, true);                // ??
             leftMoves--;
             walk(LEFT);
         }
         else if(upMoves > 0) {
+            String occupant = look(UP, true);                  // ??
             upMoves--;
             walk(UP);
         }
@@ -91,8 +96,10 @@ public class Critter3 extends Critter {
             downMoves = this.down;
             leftMoves = this.left;
             upMoves = this.up;
+            String occupant = look(RIGHT, true);               // ??
             walk(RIGHT);
         }
+        lookDuringTimeStep = false;
     }
 
     @Override

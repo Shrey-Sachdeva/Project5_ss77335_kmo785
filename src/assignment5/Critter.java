@@ -53,13 +53,48 @@ public abstract class Critter {
     protected boolean tryingToFlee = false;
     // 2D array representing Critter locations
     private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_width][Params.world_height];
+    protected static ArrayList<Critter>[][] myWorldCopy = new ArrayList[Params.world_width][Params.world_height];
+    protected boolean lookDuringTimeStep = false;
 
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
 	}
 	
-	protected final String look(int direction, boolean steps) {return "";}
+	protected final String look(int direction, boolean steps) {
+        energy -= Params.look_energy_cost;
+        ArrayList<Critter>[][] world;
+        if(lookDuringTimeStep) {
+            world = myWorldCopy;
+        }
+        else {
+            world = myWorld;
+        }
+	    int xChange = xMovement(direction);
+        int yChange = yMovement(direction);
+	    if(steps) {
+	        xChange *= 2;
+	        yChange *= 2;
+        }
+        int new_x_coord = x_coord + xChange;
+	    int new_y_coord = y_coord + yChange;
+        new_x_coord %= Params.world_width;
+        new_y_coord %= Params.world_height;
+        new_x_coord = new_x_coord < 0 ? Params.world_width + new_x_coord : new_x_coord;
+        new_y_coord = new_y_coord < 0 ? Params.world_height + new_y_coord : new_y_coord;
+        if(world[new_x_coord][new_y_coord] == null){
+            return null;
+        }
+        else {
+            ArrayList<Critter> occupants = world[new_x_coord][new_y_coord];
+            if(occupants.size() == 0) {
+                return null;
+            }
+            else {
+                return occupants.get(0).toString();
+            }
+        }
+    }
 	
 	/* rest is unchanged from Project 4 */
 
@@ -237,6 +272,7 @@ public abstract class Critter {
      * Simulates passage of one unit of time in the world
      */
     public static void worldTimeStep() {
+        myWorldCopy = myWorld.clone();
         // Perform each Critter's time step for every Critter in the population
         for(Critter c : population) {
             c.doTimeStep();
