@@ -266,7 +266,7 @@ public class Main {
         for(String in : input) {
             ret = ret +in + " ";
         }
-        return ret;
+        return "hello";
     }
 
     /**
