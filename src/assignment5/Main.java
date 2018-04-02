@@ -1,7 +1,19 @@
 package assignment5;
 	
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+
+import java.util.ArrayList;
+
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -17,50 +29,40 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.stage.Stage;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-
+import javafx.collections.FXCollections;
+import javafx.scene.control.ToggleButton;
 public class Main extends Application {
 	static AnchorPane mainPane = new AnchorPane();
-	static GridPane grid = new GridPane();
+	static GridPane grid;
+	static Canvas[][] canvases;
+	static ChoiceBox makeCritterChoiceBox; 
+	static TextField stepTextField;
+	static TextField seedTextField;
+	static TextField makeTextField;
+	static TextField animateTextField;
+	static TextField makeCritterChoiceTextField;
+	static TextArea statsTextArea;
+	static Button makeButton;
+	static Button stepButton;
+	static Button seedButton;
+	static Button statsButton;
+	static ToggleButton animateButton;
+	
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {			
-			primaryStage.setTitle("Critter Time :)");
 			
-			Group group = new Group();
-			Button button = new Button("please");
-			
-			Scene scene = new Scene(mainPane,900,600);
-			
-			initGrid(grid);
-			grid.setManaged(true);
-			
-			//group.getChildren().add(mainPane);
-			AnchorPane.setLeftAnchor(grid, 300.0);
-			AnchorPane.setRightAnchor(grid, 0.0);
-			AnchorPane.setBottomAnchor(grid, 0.0);
-			AnchorPane.setTopAnchor(grid, 0.0);
-			mainPane.setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-			mainPane.getChildren().add(grid);
-			//grid.setLayoutX(300);
-			//grid.setLayoutY(0);
-			
-			//group.getChildren().add(grid);
-			
-			
-			//scene.
-			primaryStage.setResizable(false);
-			primaryStage.setScene(scene);
-			
-			
+			initLayout(primaryStage);
+			initButtonActions();
 			
 			primaryStage.show();
 			
 			
 			
-			//Scene myScene = new Scene(,300,300,Color.BLUE);
-			//primaryStage.setScene(myScene);
 			
 		} catch(Exception e) {
 			e.printStackTrace();		
@@ -72,20 +74,218 @@ public class Main extends Application {
 		launch(args);
 	}
 	
+	public static void initButtonActions() {
+		makeButton.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent arg0) {
+				String choice = makeCritterChoiceTextField.getText();
+				if(isValidClass(choice)) {
+					try {
+						/**TODO Handle making multiple critters from one button press!**/
+						Critter.makeCritter(choice);
+						Critter.displayWorld();
+						Critter.displayWorld(grid);
+					} catch (InvalidCritterException e) {
+						
+						statsTextArea.setText("Invalid critter exception!");
+					}
+				}else {
+					statsTextArea.setText("Invalid critter choice!");
+				}
+				
+			}
+		});
+		stepButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				/**TODO Handle MANY world time steps at a time!**/
+				Critter.worldTimeStep();
+				Critter.displayWorld();
+				Critter.displayWorld(grid);
+				
+			}
+		});
+		
+	}
+	
+	
+	
+	public static void initLayout(Stage primaryStage) {
+		primaryStage.setTitle("Critter Time :)");
+		Scene scene = new Scene(mainPane,900,600);
+		
+
+
+		//GRID INITIALIZATION
+		grid = new GridPane();
+		initGrid(grid);
+		grid.setManaged(true);
+		AnchorPane.setLeftAnchor(grid, 300.0);
+		AnchorPane.setRightAnchor(grid, 0.0);
+		AnchorPane.setBottomAnchor(grid, 0.0);
+		AnchorPane.setTopAnchor(grid, 0.0);
+		mainPane.setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+		mainPane.getChildren().add(grid);
+		grid.setGridLinesVisible(true);
+		
+		//BUTTONS INITIALIZATION
+		makeButton = new Button("Make");
+		stepButton = new Button("Step");
+		seedButton = new Button("Seed");
+		statsButton = new Button("Stats");
+		animateButton = new ToggleButton("Animate");
+		
+		//Make:
+		setAnchor(makeButton,10,10,60,20);
+		mainPane.getChildren().add(makeButton);
+		//Step:
+		setAnchor(stepButton,10,50,60,20);
+		mainPane.getChildren().add(stepButton);
+		//Seed:
+		setAnchor(seedButton,10,130,60,20);
+		mainPane.getChildren().add(seedButton);
+		//Run Stats:
+		setAnchor(statsButton,10,170,60,20);
+		mainPane.getChildren().add(statsButton);
+		//Animate:
+		setAnchor(animateButton,10, 90, 60, 20);
+		mainPane.getChildren().add(animateButton);
+		animateButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				if(animateButton.getText().equals("Animate")) {
+					animateButton.setText("Stop");
+				}else {
+					animateButton.setText("Animate");
+					animateButton.disarm();
+				}
+				
+			}
+		});
+		
+		//DROP DOWN MENUS:
+		/*makeCritterChoiceBox = new ChoiceBox((ObservableList) getPossibleCrittersToMake());
+		setAnchor(makeCritterChoiceBox, 90, 10, 100, 20);
+		mainPane.getChildren().add(makeCritterChoiceBox);*/
+		makeCritterChoiceTextField = new TextField();
+		setAnchor(makeCritterChoiceTextField, 90, 10, 100, 20);
+		mainPane.getChildren().add(makeCritterChoiceTextField);
+		
+		//Step Text Field:
+		stepTextField = new TextField();
+		setAnchor(stepTextField, 90, 50, 100, 20);
+		mainPane.getChildren().add(stepTextField);
+		stepTextField.textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		            stepTextField.setText(newValue.replaceAll("[^\\d]", ""));
+		        }
+		    }
+		});
+		stepTextField.setPromptText("How many steps?");
+		//Seed text field
+		seedTextField = new TextField();
+		setAnchor(seedTextField, 90, 130, 100, 20);
+		seedTextField.setPromptText("Random seed");
+		mainPane.getChildren().add(seedTextField);
+		seedTextField.textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		            seedTextField.setText(newValue.replaceAll("[^\\d]", ""));
+		        }
+		    }
+		});
+		//Make text field:
+		makeTextField = new TextField();
+		makeTextField.setPromptText("How many?");
+		setAnchor(makeTextField, 210, 10, 70, 20);
+		mainPane.getChildren().add(makeTextField);
+		makeTextField.textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		            makeTextField.setText(newValue.replaceAll("[^\\d]", ""));
+		        }
+		    }
+		});
+		
+		//Animate text field:
+		animateTextField = new TextField();
+		animateTextField.setPromptText("Animation speed");
+		setAnchor(animateTextField, 90, 90, 100, 20);
+		mainPane.getChildren().add(animateTextField);
+		animateTextField.textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		            makeTextField.setText(newValue.replaceAll("[^\\d]", ""));
+		        }
+		    }
+		});
+		
+		//Stats text area
+		statsTextArea = new TextArea();
+		setAnchor(statsTextArea, 5, 200, 280, 290);
+		mainPane.getChildren().add(statsTextArea);
+		statsTextArea.setEditable(false);
+		
+		
+		//MISC STAGE INITIALIZATION
+		primaryStage.setResizable(false);
+		primaryStage.setScene(scene);
+		
+	}
+	
+	public static void setAnchor(Node child, double x, double y, double width, double height) {
+		AnchorPane.setLeftAnchor(child, x);
+		AnchorPane.setRightAnchor(child,900-x-width);
+		AnchorPane.setBottomAnchor(child, 600-y-height);
+		AnchorPane.setTopAnchor(child, y);
+	}
+	
+	public static ObservableList getPossibleCrittersToMake(){
+		//FXCollections.ObservableList<String> choices;
+		//choices.add("Blupe");
+		//choices.add("Shrey");
+		//choices.add("Kylar");
+		return FXCollections.observableArrayList("First", "Second", "Third");
+	}
 	
 	public static void initGrid(GridPane grid) {
+		canvases = new Canvas[Params.world_height][Params.world_width];
 		for(int c = 0; c < Params.world_width; c++) {
 			for(int r = 0; r < Params.world_height; r++) {
 				Canvas canvas = new Canvas();
 				canvas.setWidth(600.0/(Params.world_width));
 				canvas.setHeight(600.0/(Params.world_height));
-				GraphicsContext gc = canvas.getGraphicsContext2D();
-				gc.setFill(Color.BLACK);
-				//gc.fillRect(0, 0, 200/Params.world_width, 200/Params.world_height);
-				gc.setFont(new Font("TimesRoman", 1));
-				gc.fillText(""+c, 0, 0);
 				grid.add(canvas, c, r);
+				canvases[r][c] = canvas;
+				GraphicsContext gc = canvas.getGraphicsContext2D();
+				gc.setFill(Color.WHITE);
+				gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 			}
 		}
 	}
+	
+	/**
+     * Checks to see if a class name is a valid class
+     * @param className
+     * @return true if the class name is valid
+     */
+    private static boolean isValidClass(String className) {
+    	Class c;
+		try {
+			c = Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+		return true;
+    }
 }

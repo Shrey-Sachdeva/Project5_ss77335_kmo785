@@ -72,5 +72,13 @@ public class Critter1 extends Critter {
     	System.out.println(ones.size() + " total Critter1s running to the right with average energy: " + averageEnergy);
     	
     }
+
+	@Override
+	public CritterShape viewShape() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.BLUE; }
     
 }

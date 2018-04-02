@@ -11,8 +11,16 @@ package assignment5;
  * Spring 2018
  */
 
+
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.geometry.Dimension2D;
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 public abstract class Critter {
 	/* NEW FOR PROJECT 5 */
@@ -319,7 +327,7 @@ public abstract class Critter {
         // Add algae equal to the refresh_algae_count to the world randomly
         for(int i = 0; i < Params.refresh_algae_count; i++) {
             try {
-                makeCritter("assignment4.Algae");
+                makeCritter("assignment5.Algae");
             } catch (InvalidCritterException e) {
                 e.printStackTrace();
             }
@@ -374,6 +382,42 @@ public abstract class Critter {
 	   display component.
 	   // public static void displayWorld() {}
 	*/
+    public static void displayWorld(GridPane grid) {
+    	for(int c = 0; c < Params.world_width; c++) {
+    		for(int r = 0; r < Params.world_height; r++) {
+    			int y = r;
+    			int x = c;
+	    		if(myWorld[y][x] == null){
+	                myWorld[y][x] = new ArrayList<Critter>();
+	            }
+	    		if(myWorld[y][x].size() > 0) {
+	    			Critter displayCritter = myWorld[y][x].get(0);
+	    			
+	    			Color fillColor = displayCritter.viewFillColor();
+	    			Color outlineColor = displayCritter.viewOutlineColor();
+	    			Canvas canvas = Main.canvases[y][x];
+	    			double width = canvas.getWidth();
+	    			double height = canvas.getHeight();
+	    			
+	    			GraphicsContext gc = canvas.getGraphicsContext2D();
+	    			
+	    			gc.setFill(fillColor);
+	    			gc.fillRect(0, 0, width, height);
+	    			
+	    		}else {
+	    			Canvas canvas = Main.canvases[y][x];
+	    			double width = canvas.getWidth();
+	    			double height = canvas.getHeight();
+	    			
+	    			GraphicsContext gc = canvas.getGraphicsContext2D();
+	    			
+	    			gc.setFill(Color.WHITE);
+	    			gc.fillRect(0, 0, width, height);
+	    		}
+    		}
+    	}
+    	
+    }
     /**
      * Display world in response to command "show"
      */
@@ -422,8 +466,8 @@ public abstract class Critter {
      * @throws InvalidCritterException
      */
     public static void makeCritter(String critter_class_name) throws InvalidCritterException {
-        if(!critter_class_name.contains("assignment4.")){
-            critter_class_name = "assignment4."+critter_class_name;
+        if(!critter_class_name.contains("assignment5.")){
+            critter_class_name = "assignment5."+critter_class_name;
         }
         try {
             Class c = Class.forName(critter_class_name);
@@ -450,8 +494,8 @@ public abstract class Critter {
      * @throws InvalidCritterException
      */
     public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
-        if(!critter_class_name.contains("assignment4.")){
-            critter_class_name = "assignment4." + critter_class_name;
+        if(!critter_class_name.contains("assignment5.")){
+            critter_class_name = "assignment5." + critter_class_name;
         }
         List<Critter> result = new ArrayList<Critter>();
         try {
