@@ -26,6 +26,8 @@ public class Critter4 extends Critter {
 	
 	private int kids = 0;
 	private int fights = 0;
+	
+	public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.PURPLE; }
     public Critter4() {
 
     }
@@ -79,4 +81,10 @@ public class Critter4 extends Critter {
     	
     	System.out.println(fours.size() + " total Critter4s birthing babies\taverage #kids: " + averageKids + "\taverage #fights: "+averageFights + "\taverage kids per fight: "+ averageKidsPerFight + "\taverage energy: "+averageEnergy);
     }
+
+	@Override
+	public CritterShape viewShape() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

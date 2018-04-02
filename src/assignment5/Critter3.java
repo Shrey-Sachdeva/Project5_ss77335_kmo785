@@ -40,6 +40,8 @@ public class Critter3 extends Critter {
     private int leftMoves;
     private int upMoves;
 
+    public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.DARKRED; }
+    
     public Critter3() {
         rightMoves = 4;
         downMoves = 4;
@@ -137,4 +139,10 @@ public class Critter3 extends Critter {
     	averageEnergy /= threes.size();
     	System.out.println(threes.size() + " total Critter3s being territorial. Territory Perimeter stats:\tminimum: "+minimumBoxPerimeter+"\tmaximum: "+maximumBoxPerimeter + "\taverage: " +averageBoxPerimeter  + "\taverage energy: " + averageEnergy);
     }
+
+	@Override
+	public CritterShape viewShape() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

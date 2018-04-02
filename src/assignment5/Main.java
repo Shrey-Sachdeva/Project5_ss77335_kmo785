@@ -6,7 +6,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import assignment5.Critter;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -50,7 +53,9 @@ public class Main extends Application {
 	static Button seedButton;
 	static Button statsButton;
 	static ToggleButton animateButton;
-	
+	static Timer timer;
+	static boolean animating = false;
+	static TimerTask task;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -74,16 +79,70 @@ public class Main extends Application {
 		launch(args);
 	}
 	
+	
+	public static int getMakeNumber() {
+		String text = makeTextField.getText();
+		try {
+			int number = Integer.parseInt(text);
+			return number;
+		}catch(NumberFormatException e) {
+			return -1;
+		}
+		
+	}
+	public static int getStepNumber() {
+		String text = stepTextField.getText();
+		try {
+			int number = Integer.parseInt(text);
+			return number;
+		}catch(NumberFormatException e) {
+			return -1;
+		}
+		
+		
+	}
+	public static int getAnimationSpeed() {
+		String text = animateTextField.getText();
+		double scale = 1000;
+		try {
+			int number = Integer.parseInt(text);
+			return (int) (scale/number);
+		}catch(NumberFormatException e) {
+			return (int) scale;
+		}
+	}
+	public static int getSeedFromText() {
+		String text = seedTextField.getText();
+		try {
+			int number = Integer.parseInt(text);
+			return number;
+		}catch(NumberFormatException e) {
+			return -1;
+		}
+		
+	}
 	public static void initButtonActions() {
 		makeButton.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override
 			public void handle(ActionEvent arg0) {
+				if(animating) {
+					return;
+				}
 				String choice = makeCritterChoiceTextField.getText();
+				choice = "assignment5."+choice;
 				if(isValidClass(choice)) {
 					try {
 						/**TODO Handle making multiple critters from one button press!**/
-						Critter.makeCritter(choice);
+						int number = getMakeNumber();
+	        			if(number > 0) {//if there is a specified number of critters to make
+	        				while(number > 0) {//make that number of critters
+	        					Critter.makeCritter(choice);
+	        					number--;
+	        				}
+	        			}else {
+	        				Critter.makeCritter(choice);
+	        			}
 						Critter.displayWorld();
 						Critter.displayWorld(grid);
 					} catch (InvalidCritterException e) {
@@ -99,16 +158,81 @@ public class Main extends Application {
 		stepButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
+				if(animating) {
+					return;
+				}
 				/**TODO Handle MANY world time steps at a time!**/
-				Critter.worldTimeStep();
+				int number = getStepNumber();
+    			if(number > 0) {//if there is a specified number of critters to make
+    				while(number > 0) {//make that number of critters
+    					Critter.worldTimeStep();
+    					number--;
+    				}
+    			}else {
+    				Critter.worldTimeStep();
+    			}
 				Critter.displayWorld();
 				Critter.displayWorld(grid);
 				
 			}
 		});
+		animateButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				if(animateButton.getText().equals("Animate")) {
+					animateButton.setText("Stop");
+					int speed = getAnimationSpeed();
+					timer = new Timer();
+					Critter.displayWorld();
+					task = new TimerTask() {
+						public void run() {
+							Critter.worldTimeStep();
+							Critter.displayWorld(grid);
+						}
+					};
+					setDisableInputs(true);
+					timer.schedule(task,200, speed);
+					
+					
+					animating = true;
+				}else {
+					
+					animateButton.setText("Animate");
+					animateButton.disarm();
+					timer.cancel();
+					animating = false;
+					setDisableInputs(false);
+				}
+				
+			}
+		});
 		
+		seedButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				int seed = getSeedFromText();
+				if(seed >= 0) {
+					Critter.setSeed(seed);
+				}
+			}
+		});
 	}
 	
+	
+	/**
+	 * Used during animation to disable inputs
+	 */
+	public static void setDisableInputs(boolean value) {
+		makeButton.setDisable(value);
+		stepButton.setDisable(value);
+		seedButton.setDisable(value);
+		statsButton.setDisable(value);
+		makeTextField.setDisable(value);
+		stepTextField.setDisable(value);
+		animateTextField.setDisable(value);
+		makeCritterChoiceTextField.setDisable(value);
+		seedTextField.setDisable(value);
+	}
 	
 	
 	public static void initLayout(Stage primaryStage) {
@@ -151,18 +275,7 @@ public class Main extends Application {
 		//Animate:
 		setAnchor(animateButton,10, 90, 60, 20);
 		mainPane.getChildren().add(animateButton);
-		animateButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				if(animateButton.getText().equals("Animate")) {
-					animateButton.setText("Stop");
-				}else {
-					animateButton.setText("Animate");
-					animateButton.disarm();
-				}
-				
-			}
-		});
+		
 		
 		//DROP DOWN MENUS:
 		/*makeCritterChoiceBox = new ChoiceBox((ObservableList) getPossibleCrittersToMake());
@@ -225,7 +338,7 @@ public class Main extends Application {
 		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
 		        String newValue) {
 		        if (!newValue.matches("\\d*")) {
-		            makeTextField.setText(newValue.replaceAll("[^\\d]", ""));
+		        	animateTextField.setText(newValue.replaceAll("[^\\d]", ""));
 		        }
 		    }
 		});

@@ -87,4 +87,11 @@ public class Critter2 extends Critter {
     	
     	
     }
+    public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.GREENYELLOW; }
+
+	@Override
+	public CritterShape viewShape() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

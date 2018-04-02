@@ -44,7 +44,7 @@ public abstract class Critter {
 	 * need to, but please preserve that intent as you implement them. 
 	 */
 	public javafx.scene.paint.Color viewColor() { 
-		return javafx.scene.paint.Color.WHITE; 
+		return javafx.scene.paint.Color.TEAL; 
 	}
 	
 	public javafx.scene.paint.Color viewOutlineColor() { return viewColor(); }
@@ -60,8 +60,8 @@ public abstract class Critter {
     // Indicates whether a Critter is moving to flee from a fight
     protected boolean tryingToFlee = false;
     // 2D array representing Critter locations
-    private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_width][Params.world_height];
-    protected static ArrayList<Critter>[][] myWorldCopy = new ArrayList[Params.world_width][Params.world_height];
+    private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_height][Params.world_width];
+    protected static ArrayList<Critter>[][] myWorldCopy = new ArrayList[Params.world_height][Params.world_width];
     protected boolean lookDuringTimeStep = false;
 
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
@@ -90,11 +90,11 @@ public abstract class Critter {
         new_y_coord %= Params.world_height;
         new_x_coord = new_x_coord < 0 ? Params.world_width + new_x_coord : new_x_coord;
         new_y_coord = new_y_coord < 0 ? Params.world_height + new_y_coord : new_y_coord;
-        if(world[new_x_coord][new_y_coord] == null){
+        if(world[new_y_coord][new_x_coord] == null){
             return null;
         }
         else {
-            ArrayList<Critter> occupants = world[new_x_coord][new_y_coord];
+            ArrayList<Critter> occupants = world[new_y_coord][new_x_coord];
             if(occupants.size() == 0) {
                 return null;
             }
@@ -149,17 +149,17 @@ public abstract class Critter {
         if(!hasMoved) {
             // Check if the Critter is trying to flee
             if(!tryingToFlee) {
-                myWorld[x_coord][y_coord].remove(this);
+                myWorld[y_coord][x_coord].remove(this);
                 x_coord += xMovement(direction);
                 y_coord += yMovement(direction);
                 x_coord %= Params.world_width;
                 y_coord %= Params.world_height;
                 x_coord = x_coord < 0 ? Params.world_width + x_coord : x_coord;
                 y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
-                if(myWorld[x_coord][y_coord] == null){
-                    myWorld[x_coord][y_coord] = new ArrayList<Critter>();
+                if(myWorld[y_coord][x_coord] == null){
+                    myWorld[y_coord][x_coord] = new ArrayList<Critter>();
                 }
-                myWorld[x_coord][y_coord].add(this);
+                myWorld[y_coord][x_coord].add(this);
             }
             else {
                 // Check if fleeing Critter tries to move into an occupied location
@@ -170,9 +170,9 @@ public abstract class Critter {
                 newX = newX < 0 ? Params.world_width + newX : newX;
                 newY = newY < 0 ? Params.world_height + newY : newY;
                 // Only allow the flee to be successful if there is no Critter already in the intended location
-                if(myWorld[newX][newY].size() == 0) {
-                    myWorld[x_coord][y_coord].remove(this);
-                    myWorld[newX][newY].add(this);
+                if(myWorld[newY][newX].size() == 0) {
+                    myWorld[y_coord][x_coord].remove(this);
+                    myWorld[newY][newX].add(this);
                     x_coord = newX;
                     y_coord = newY;
                 }
@@ -203,12 +203,12 @@ public abstract class Critter {
                 newY %= Params.world_height;
                 newX = newX < 0 ? Params.world_width + newX : newX;
                 newY = newY < 0 ? Params.world_height + newY : newY;
-                if(myWorld[newX][newY] == null){
-                    myWorld[newX][newY] = new ArrayList<>();
+                if(myWorld[newY][newX] == null){
+                    myWorld[newY][newX] = new ArrayList<>();
                 }
-                if(myWorld[newX][newY].size() == 0) {
-                    myWorld[x_coord][y_coord].remove(this);
-                    myWorld[newX][newY].add(this);
+                if(myWorld[newY][newX].size() == 0) {
+                    myWorld[y_coord][x_coord].remove(this);
+                    myWorld[newY][newX].add(this);
                     x_coord = newX;
                     y_coord = newY;
                 }
@@ -241,10 +241,10 @@ public abstract class Critter {
      */
     private static int yMovement(int direction) {
         if(direction == 1 || direction == 2 || direction == 3) {
-            return -1;
+            return 1;
         }
         else if(direction == 5 || direction == 6 || direction == 7) {
-            return 1;
+            return -1;
         }
         else {
             return 0;
@@ -286,24 +286,24 @@ public abstract class Critter {
             c.doTimeStep();
         }
         // Determine locations where multiple Critters occupy the same position
-        for(int i = 0; i < Params.world_width; i++) {
-            for(int j = 0; j < Params.world_height; j++) {
-                if(myWorld[i][j] == null){
-                    myWorld[i][j] = new ArrayList<Critter>();
+        for(int x = 0; x < Params.world_width; x++) {
+            for(int y = 0; y < Params.world_height; y++) {
+                if(myWorld[y][x] == null){
+                    myWorld[y][x] = new ArrayList<Critter>();
                 }
-                while (myWorld[i][j].size() > 1) {
-                    Critter critter1 = myWorld[i][j].get(0);
-                    Critter critter2 = myWorld[i][j].get(1);
+                while (myWorld[y][x].size() > 1) {
+                    Critter critter1 = myWorld[y][x].get(0);
+                    Critter critter2 = myWorld[y][x].get(1);
                     // Resolve the encounter between the Critters
                     resolveEncounter(critter1, critter2);
                     // Remove the dead Critters from the population
                     if (critter1.energy <= 0) {
                         population.remove(critter1);
-                        myWorld[critter1.x_coord][critter1.y_coord].remove(critter1);
+                        myWorld[critter1.y_coord][critter1.x_coord].remove(critter1);
                     }
                     if (critter2.energy <= 0) {
                         population.remove(critter2);
-                        myWorld[critter2.x_coord][critter2.y_coord].remove(critter2);
+                        myWorld[critter2.y_coord][critter2.x_coord].remove(critter2);
                     }
                 }
             }
@@ -313,7 +313,7 @@ public abstract class Critter {
         for(Critter c : population) {
             c.energy -= Params.rest_energy_cost;
             if(c.energy < 1) {
-                myWorld[c.x_coord][c.y_coord].remove(c);
+                myWorld[c.y_coord][c.x_coord].remove(c);
                 toRemove.add(c);
             }
             // Reset flags indicating movement for next time step
@@ -334,7 +334,7 @@ public abstract class Critter {
         }
         // Add all offspring to the world
         for(Critter c : babies) {
-            myWorld[c.x_coord][c.y_coord].add(c);
+            myWorld[c.y_coord][c.x_coord].add(c);
             population.add(c);
         }
         babies.clear();
@@ -349,7 +349,7 @@ public abstract class Critter {
         // Determine critter1's response
         boolean critter1Fights = critter1.fight(critter2.toString());
         // If critter1 moved away, the encounter is finished
-        if(myWorld[critter1.x_coord][critter1.y_coord].contains(critter2)) {
+        if(myWorld[critter1.y_coord][critter1.x_coord].contains(critter2)) {
             // Determine critter2's repsonse
             boolean critter2Fights = critter2.fight(critter1.toString());
             // Simulate the encounter further if both Critters are still in the same position
@@ -383,10 +383,9 @@ public abstract class Critter {
 	   // public static void displayWorld() {}
 	*/
     public static void displayWorld(GridPane grid) {
-    	for(int c = 0; c < Params.world_width; c++) {
-    		for(int r = 0; r < Params.world_height; r++) {
-    			int y = r;
-    			int x = c;
+    	for(int x = 0; x < Params.world_width; x++) {
+    		for(int y = 0; y < Params.world_height; y++) {
+    			
 	    		if(myWorld[y][x] == null){
 	                myWorld[y][x] = new ArrayList<Critter>();
 	            }
@@ -425,17 +424,17 @@ public abstract class Critter {
         // Display world
         printBounds();
         System.out.println("");
-        for(int i = 0; i < Params.world_height; i++) {
+        for(int y = 0; y < Params.world_height; y++) {
             System.out.print("|");
-            for(int j = 0; j < Params.world_width; j++) {
-                if(myWorld[j][i] == null){
-                    myWorld[j][i] = new ArrayList<Critter>();
+            for(int x = 0; x < Params.world_width; x++) {
+                if(myWorld[y][x] == null){
+                    myWorld[y][x] = new ArrayList<Critter>();
                 }
-                if(myWorld[j][i].size() == 0) {
+                if(myWorld[y][x].size() == 0) {
                     System.out.print(' ');
                 }
                 else {
-                    System.out.print(myWorld[j][i].get(0).toString());
+                    System.out.print(myWorld[y][x].get(0).toString());
                 }
             }
             System.out.print("|\n");
@@ -478,10 +477,10 @@ public abstract class Critter {
             critter.y_coord = y;
             critter.energy = Params.start_energy;
             population.add(critter);
-            if(myWorld[x][y] == null){
-                myWorld[x][y] = new ArrayList<Critter>();
+            if(myWorld[y][x] == null){
+                myWorld[y][x] = new ArrayList<Critter>();
             }
-            myWorld[x][y].add(0, critter);
+            myWorld[y][x].add(0, critter);
         } catch(Exception e) {
             throw new InvalidCritterException(critter_class_name);
         }
@@ -554,7 +553,7 @@ public abstract class Critter {
         protected void setEnergy(int new_energy_value) {
             super.energy = new_energy_value;
             if(new_energy_value < 1) {                              // Is this ok?
-                myWorld[getX_coord()][getY_coord()].remove(this);
+                myWorld[getY_coord()][getX_coord()].remove(this);
                 population.remove(this);
             }
         }
@@ -569,10 +568,10 @@ public abstract class Critter {
             super.x_coord = new_x_coord;
             // Adds the critter to the general population if its x_coord and y_coord have been set
             if(getY_coord() != -1) {
-                if(myWorld[getX_coord()][getY_coord()] == null){
-                    myWorld[getX_coord()][getY_coord()] = new ArrayList<>();
+                if(myWorld[getY_coord()][getX_coord()] == null){
+                    myWorld[getY_coord()][getX_coord()] = new ArrayList<>();
                 }
-                myWorld[getX_coord()][getY_coord()].add(this);
+                myWorld[getY_coord()][getX_coord()].add(this);
                 population.add(this);
             }
         }
@@ -587,10 +586,10 @@ public abstract class Critter {
             super.y_coord = new_y_coord;
             // Adds the critter to the general population if its x_coord and y_coord have been set
             if(getX_coord() != -1) {
-                if(myWorld[getX_coord()][getY_coord()] == null){
-                    myWorld[getX_coord()][getY_coord()] = new ArrayList<>();
+                if(myWorld[getY_coord()][getX_coord()] == null){
+                    myWorld[getY_coord()][getX_coord()] = new ArrayList<>();
                 }
-                myWorld[getX_coord()][getY_coord()].add(this);
+                myWorld[getY_coord()][getX_coord()].add(this);
                 population.add(this);
             }
         }
@@ -636,7 +635,7 @@ public abstract class Critter {
      * Clear the world of all critters, dead and alive
      */
     public static void clearWorld() {
-        myWorld = new ArrayList[Params.world_width][Params.world_height];
+        myWorld = new ArrayList[Params.world_height][Params.world_width];
         population = new ArrayList<>();
     }
 }
