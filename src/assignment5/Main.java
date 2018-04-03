@@ -183,11 +183,23 @@ public class Main extends Application {
 					animateButton.setText("Stop");
 					int speed = getAnimationSpeed();
 					timer = new Timer();
-					Critter.displayWorld();
+					//Critter.displayWorld();
 					task = new TimerTask() {
+						
+						private boolean ready = true;
 						public void run() {
-							Critter.worldTimeStep();
-							Critter.displayWorld(grid);
+							if(ready) {
+								ready = false;
+								Critter.worldTimeStep();
+								try {
+									Critter.displayWorld(grid);
+								}catch(NullPointerException e){
+									System.out.println("Caught null pointer in display world");
+									timer.cancel();
+									statsTextArea.setText("Animation was too fast, buffer overflow caused loss of canvas pointer");
+								}
+								ready = true;
+							}
 						}
 					};
 					setDisableInputs(true);

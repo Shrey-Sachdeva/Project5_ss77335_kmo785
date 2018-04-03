@@ -87,11 +87,16 @@ public class Critter2 extends Critter {
     	
     	
     }
-    public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.GREENYELLOW; }
+    public javafx.scene.paint.Color viewFillColor() { 
+    	if(this.age < 3) {
+    		return javafx.scene.paint.Color.GREENYELLOW; 
+    	}
+    	return javafx.scene.paint.Color.DARKOLIVEGREEN;
+    }
 
 	@Override
 	public CritterShape viewShape() {
 		// TODO Auto-generated method stub
-		return null;
+		return CritterShape.SQUARE;
 	}
 }

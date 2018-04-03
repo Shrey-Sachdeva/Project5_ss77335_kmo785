@@ -44,7 +44,7 @@ public abstract class Critter {
 	 * need to, but please preserve that intent as you implement them. 
 	 */
 	public javafx.scene.paint.Color viewColor() { 
-		return javafx.scene.paint.Color.TEAL; 
+		return javafx.scene.paint.Color.WHITE; 
 	}
 	
 	public javafx.scene.paint.Color viewOutlineColor() { return viewColor(); }
@@ -63,7 +63,7 @@ public abstract class Critter {
     private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_height][Params.world_width];
     protected static ArrayList<Critter>[][] myWorldCopy = new ArrayList[Params.world_height][Params.world_width];
     protected boolean lookDuringTimeStep = false;
-
+    
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -397,11 +397,48 @@ public abstract class Critter {
 	    			Canvas canvas = Main.canvases[y][x];
 	    			double width = canvas.getWidth();
 	    			double height = canvas.getHeight();
-	    			
 	    			GraphicsContext gc = canvas.getGraphicsContext2D();
-	    			
-	    			gc.setFill(fillColor);
+	    			gc.setFill(Color.WHITE);
 	    			gc.fillRect(0, 0, width, height);
+	    			gc.setFill(fillColor);
+	    			
+	    			gc.setStroke(outlineColor);
+	    			int lineWidth = (int) (150.0/((Params.world_height+Params.world_width)/2));
+	    			gc.setLineWidth(lineWidth);
+	    			CritterShape viewShape = displayCritter.viewShape();
+	    			if(viewShape == null) {
+	    				viewShape = CritterShape.SQUARE;
+	    			}
+	    			switch(viewShape) {
+						case CIRCLE:
+							gc.fillOval(0, 0, width, height);
+							gc.strokeOval(0, 0, width, height);
+							break;
+						case DIAMOND:
+							double xPoints[] = {0, width/2.0, width, width/2.0};
+							double yPoints[] = {height/2.0, 0, height/2.0, height};
+							gc.fillPolygon(xPoints, yPoints, 4);
+							gc.strokePolygon(xPoints, yPoints, 4);
+							break;
+						case SQUARE:
+							gc.fillRect(0, 0, width, height);
+							gc.strokeRect(0, 0, width, height);
+							break;
+						case STAR:
+							//TODO star
+							break;
+						case TRIANGLE:
+							double xPoints2[] = {0, width/2.0, width};
+							double yPoints2[] = {height, 0, height};
+							gc.fillPolygon(xPoints2, yPoints2, 3);
+							gc.strokePolygon(xPoints2, yPoints2, 3);
+							break;
+						default:
+							break;
+	    			
+	    			}
+	    			
+	    			
 	    			
 	    		}else {
 	    			Canvas canvas = Main.canvases[y][x];
