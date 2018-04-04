@@ -57,20 +57,20 @@ public class Critter1 extends Critter {
        }
     }
     
-    public static void runStats(java.util.List<Critter> ones) {
-    	if(ones.size() == 0) {
-    		System.out.println("0 total Critter1s, how sad");
-    		return;
-    	}
-    	
-    	int averageEnergy  = 0;
-    	for(Object o : ones) {
-    		Critter1 one = (Critter1) o;
-    		averageEnergy += one.getEnergy();
-    	}
-    	averageEnergy /= ones.size();
-    	System.out.println(ones.size() + " total Critter1s running to the right with average energy: " + averageEnergy);
-    	
+    public static String runStats(java.util.List<Critter> ones) {                                                         //
+        if(ones.size() == 0) {
+            //System.out.println("0 total Critter1s, how sad");
+            return "0 total Critter1s, how sad";
+        }
+
+        int averageEnergy  = 0;
+        for(Object o : ones) {
+            Critter1 one = (Critter1) o;
+            averageEnergy += one.getEnergy();
+        }
+        averageEnergy /= ones.size();
+        //System.out.println(ones.size() + " total Critter1s running to the right with average energy: " + averageEnergy);
+        return (ones.size() + " total Critter1s running to the right with average energy: " + averageEnergy);
     }
 
 	@Override
@@ -79,6 +79,6 @@ public class Critter1 extends Critter {
 		return CritterShape.TRIANGLE;
 	}
 	
-	public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.PURPLE; }
+	public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.YELLOW; }
 	public javafx.scene.paint.Color viewOutlineColor() { return javafx.scene.paint.Color.BLUE; }
 }

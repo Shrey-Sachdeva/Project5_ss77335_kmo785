@@ -60,38 +60,42 @@ public class Critter2 extends Critter {
         }
     }
     
-    public static void runStats(java.util.List<Critter> twos) {
-    	if(twos.size() == 0) {
-    		System.out.println("0 total Critter2s");
-    		return;
-    	}
-    	int minimumAge = ((Critter2)twos.get(0)).age;
-    	int maximumAge = ((Critter2)twos.get(0)).age;
-    	int averageAge = 0;
-    	int averageEnergy = 0;
-    	for(Object t : twos) {
-    		Critter2 two = (Critter2) t;
-    		averageAge += two.age;
-    		if(two.age < minimumAge) {
-    			minimumAge = two.age;
-    		}
-    		if(two.age > maximumAge) {
-    			maximumAge = two.age;
-    		}
-    		averageEnergy += two.getEnergy();
-    	}
-    	averageAge /= twos.size();
-    	averageEnergy /= twos.size();
-    	System.out.println(twos.size() + " total Critter2s\tminimum age: " + minimumAge + "\tmaximum age:" + maximumAge + "\taverage age" + averageAge + "\taverage energy: "+averageEnergy);
-    	
-    	
-    	
+    public static String runStats(java.util.List<Critter> twos) {                                                       //
+        if(twos.size() == 0) {
+            //System.out.println("0 total Critter2s");
+            return "0 total Critter2s";
+        }
+        int minimumAge = ((Critter2)twos.get(0)).age;
+        int maximumAge = ((Critter2)twos.get(0)).age;
+        int averageAge = 0;
+        int averageEnergy = 0;
+        for(Object t : twos) {
+            Critter2 two = (Critter2) t;
+            averageAge += two.age;
+            if(two.age < minimumAge) {
+                minimumAge = two.age;
+            }
+            if(two.age > maximumAge) {
+                maximumAge = two.age;
+            }
+            averageEnergy += two.getEnergy();
+        }
+        averageAge /= twos.size();
+        averageEnergy /= twos.size();
+        //System.out.println(twos.size() + " total Critter2s\tminimum age: " + minimumAge + "\tmaximum age:" + maximumAge + "\taverage age" + averageAge + "\taverage energy: "+averageEnergy);
+        return (twos.size() + " total Critter2s\tminimum age: " + minimumAge + "\tmaximum age:" + maximumAge + "\taverage age" + averageAge + "\taverage energy: "+averageEnergy);
     }
     public javafx.scene.paint.Color viewFillColor() { 
     	if(this.age < 3) {
     		return javafx.scene.paint.Color.GREENYELLOW; 
     	}
     	return javafx.scene.paint.Color.DARKOLIVEGREEN;
+    }
+    public javafx.scene.paint.Color viewOutlineColor() { 
+    	if(this.age < 3) {
+    		return javafx.scene.paint.Color.GREENYELLOW; 
+    	}
+    	return javafx.scene.paint.Color.DARKGRAY;
     }
 
 	@Override

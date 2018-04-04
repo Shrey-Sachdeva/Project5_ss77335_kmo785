@@ -41,6 +41,7 @@ public class Critter3 extends Critter {
     private int upMoves;
 
     public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.DARKRED; }
+    public javafx.scene.paint.Color viewOutlineColor() { return javafx.scene.paint.Color.RED; }
     
     public Critter3() {
         rightMoves = 4;
@@ -113,36 +114,37 @@ public class Critter3 extends Critter {
     	return right + down + left + up;
     }
     
-    public static void runStats(java.util.List<Critter> threes) {
-    	
-    	if(threes.size() == 0) {
-    		System.out.println("0 total Critter3s");
-    		return;
-    	}
-    	int minimumBoxPerimeter = ((Critter3)threes.get(0)).getBoxPerimeter();
-    	int maximumBoxPerimeter = 0;
-    	int averageBoxPerimeter = 0;
-    	int averageEnergy = 0;
-    	
-    	for(Object t : threes) {
-    		Critter3 three = (Critter3) t;
-    		averageBoxPerimeter += three.getBoxPerimeter();
-    		if(three.getBoxPerimeter() < minimumBoxPerimeter) {
-    			minimumBoxPerimeter = three.getBoxPerimeter();
-    		}
-    		if(three.getBoxPerimeter() > maximumBoxPerimeter) {
-    			maximumBoxPerimeter = three.getBoxPerimeter();
-    		}
-    		averageEnergy += three.getEnergy();
-    	}
-    	averageBoxPerimeter /= threes.size();
-    	averageEnergy /= threes.size();
-    	System.out.println(threes.size() + " total Critter3s being territorial. Territory Perimeter stats:\tminimum: "+minimumBoxPerimeter+"\tmaximum: "+maximumBoxPerimeter + "\taverage: " +averageBoxPerimeter  + "\taverage energy: " + averageEnergy);
+    public static String runStats(java.util.List<Critter> threes) {                                                     //
+
+        if(threes.size() == 0) {
+            //System.out.println("0 total Critter3s");
+            return "0 total Critter3s";
+        }
+        int minimumBoxPerimeter = ((Critter3)threes.get(0)).getBoxPerimeter();
+        int maximumBoxPerimeter = 0;
+        int averageBoxPerimeter = 0;
+        int averageEnergy = 0;
+
+        for(Object t : threes) {
+            Critter3 three = (Critter3) t;
+            averageBoxPerimeter += three.getBoxPerimeter();
+            if(three.getBoxPerimeter() < minimumBoxPerimeter) {
+                minimumBoxPerimeter = three.getBoxPerimeter();
+            }
+            if(three.getBoxPerimeter() > maximumBoxPerimeter) {
+                maximumBoxPerimeter = three.getBoxPerimeter();
+            }
+            averageEnergy += three.getEnergy();
+        }
+        averageBoxPerimeter /= threes.size();
+        averageEnergy /= threes.size();
+        //System.out.println(threes.size() + " total Critter3s being territorial. Territory Perimeter stats:\tminimum: "+minimumBoxPerimeter+"\tmaximum: "+maximumBoxPerimeter + "\taverage: " +averageBoxPerimeter  + "\taverage energy: " + averageEnergy);
+        return (threes.size() + " total Critter3s being territorial. Territory Perimeter stats:\tminimum: "+minimumBoxPerimeter+"\tmaximum: "+maximumBoxPerimeter + "\taverage: " +averageBoxPerimeter  + "\taverage energy: " + averageEnergy);
     }
 
 	@Override
 	public CritterShape viewShape() {
 		// TODO Auto-generated method stub
-		return null;
+		return CritterShape.STAR;
 	}
 }

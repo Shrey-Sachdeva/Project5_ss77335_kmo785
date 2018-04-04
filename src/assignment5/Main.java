@@ -5,7 +5,10 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,17 +48,22 @@ public class Main extends Application {
 	static TextField stepTextField;
 	static TextField seedTextField;
 	static TextField makeTextField;
+	static TextField statsTextField;
 	static TextField animateTextField;
 	static TextField makeCritterChoiceTextField;
 	static TextArea statsTextArea;
+	static TextArea statsListTextArea;
 	static Button makeButton;
 	static Button stepButton;
 	static Button seedButton;
 	static Button statsButton;
+	static Button statsAddButton;
+	static Button statsRemoveButton;
 	static ToggleButton animateButton;
 	static Timer timer;
 	static boolean animating = false;
 	static TimerTask task;
+	static ArrayList<String> statsCritterList;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -122,6 +130,16 @@ public class Main extends Application {
 		
 	}
 	public static void initButtonActions() {
+		statsButton.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent arg0) {
+				
+					displayStats();
+				
+				
+			}
+		});
 		makeButton.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override
@@ -143,6 +161,7 @@ public class Main extends Application {
 	        			}else {
 	        				Critter.makeCritter(choice);
 	        			}
+	        			displayStats();
 						Critter.displayWorld();
 						Critter.displayWorld(grid);
 					} catch (InvalidCritterException e) {
@@ -171,6 +190,7 @@ public class Main extends Application {
     			}else {
     				Critter.worldTimeStep();
     			}
+    			displayStats();
 				Critter.displayWorld();
 				Critter.displayWorld(grid);
 				
@@ -191,6 +211,7 @@ public class Main extends Application {
 							if(ready) {
 								ready = false;
 								Critter.worldTimeStep();
+								displayStats();
 								try {
 									Critter.displayWorld(grid);
 								}catch(NullPointerException e){
@@ -228,6 +249,67 @@ public class Main extends Application {
 				}
 			}
 		});
+		statsCritterList = new ArrayList<String>();
+		statsAddButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				String choice = statsTextField.getText();
+				String classChoice = "assignment5." + choice;
+				if(isValidClass(classChoice)){
+					if(!statsCritterList.contains(choice)) {
+						statsCritterList.add(choice);
+						displayStatsList();
+						displayStats();
+					}else {
+						statsTextArea.setText(choice + " is already being displayed!");
+					}
+				}else {
+					statsTextArea.setText(choice + " is an invalid critter");
+				}
+			}
+		});
+		statsRemoveButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				String choice = statsTextField.getText();
+				if(statsCritterList.contains(choice)) {
+					statsCritterList.remove(choice);
+					displayStatsList();
+					displayStats();
+				}else {
+					statsTextArea.setText(choice + " was not already displayed");
+				}
+			}
+		});
+	}
+	
+	public static void displayStatsList() {
+		String newText = "";
+		for(String s : statsCritterList) {
+			newText = newText + s + "\n";
+		}
+		statsListTextArea.setText(newText);
+	}
+	
+	public static void displayStats() {
+		String newText = "";
+		for(String s : statsCritterList) {
+			String choice = "assignment5." + s;
+			try {
+				List<Critter> critterList = Critter.getInstances(choice);
+    			Method runStatsMethod;
+			
+				Class<Critter> newCritter = (Class<Critter>) Class.forName(choice);
+				runStatsMethod = newCritter.getMethod("runStats", List.class);
+				String stats = (String) runStatsMethod.invoke(newCritter, critterList);
+				newText = newText + stats + "\n";
+			} catch (InvalidCritterException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+				
+				statsTextArea.setText("Invalid critter exception!");
+			}
+		}
+		statsTextArea.setText(newText);
+		
 	}
 	
 	
@@ -240,10 +322,13 @@ public class Main extends Application {
 		seedButton.setDisable(value);
 		statsButton.setDisable(value);
 		makeTextField.setDisable(value);
+		statsTextField.setDisable(value);
 		stepTextField.setDisable(value);
 		animateTextField.setDisable(value);
 		makeCritterChoiceTextField.setDisable(value);
 		seedTextField.setDisable(value);
+		statsAddButton.setDisable(value);
+		statsRemoveButton.setDisable(value);
 	}
 	
 	
@@ -271,6 +356,8 @@ public class Main extends Application {
 		seedButton = new Button("Seed");
 		statsButton = new Button("Stats");
 		animateButton = new ToggleButton("Animate");
+		statsAddButton = new Button("Add");
+		statsRemoveButton = new Button("Del");
 		
 		//Make:
 		setAnchor(makeButton,10,10,60,20);
@@ -284,6 +371,10 @@ public class Main extends Application {
 		//Run Stats:
 		setAnchor(statsButton,10,170,60,20);
 		mainPane.getChildren().add(statsButton);
+		setAnchor(statsAddButton,200,170,30,20);
+		mainPane.getChildren().add(statsAddButton);
+		setAnchor(statsRemoveButton,240,170,30,20);
+		mainPane.getChildren().add(statsRemoveButton);
 		//Animate:
 		setAnchor(animateButton,10, 90, 60, 20);
 		mainPane.getChildren().add(animateButton);
@@ -340,6 +431,11 @@ public class Main extends Application {
 		    }
 		});
 		
+		statsTextField = new TextField();
+		statsTextField.setPromptText("Which Critter?");
+		setAnchor(statsTextField, 90, 170, 100, 20);
+		mainPane.getChildren().add(statsTextField);
+		
 		//Animate text field:
 		animateTextField = new TextField();
 		animateTextField.setPromptText("Animation speed");
@@ -361,6 +457,10 @@ public class Main extends Application {
 		mainPane.getChildren().add(statsTextArea);
 		statsTextArea.setEditable(false);
 		
+		statsListTextArea = new TextArea();
+		setAnchor(statsListTextArea, 5, 500, 280, 95);
+		mainPane.getChildren().add(statsListTextArea);
+		statsListTextArea.setEditable(false);
 		
 		//MISC STAGE INITIALIZATION
 		primaryStage.setResizable(false);
@@ -382,6 +482,8 @@ public class Main extends Application {
 		//choices.add("Kylar");
 		return FXCollections.observableArrayList("First", "Second", "Third");
 	}
+	
+	
 	
 	public static void initGrid(GridPane grid) {
 		canvases = new Canvas[Params.world_height][Params.world_width];

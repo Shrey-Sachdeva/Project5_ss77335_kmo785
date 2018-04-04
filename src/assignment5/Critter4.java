@@ -28,6 +28,7 @@ public class Critter4 extends Critter {
 	private int fights = 0;
 	
 	public javafx.scene.paint.Color viewFillColor() { return javafx.scene.paint.Color.PURPLE; }
+	public javafx.scene.paint.Color viewOutlineColor() { return javafx.scene.paint.Color.BLUE; }
     public Critter4() {
 
     }
@@ -56,35 +57,35 @@ public class Critter4 extends Critter {
         return false;
     }
     
-    public static void runStats(java.util.List<Critter> fours) {
-    	if(fours.size() == 0) {
-    		System.out.println("0 total Critter4s");
-    		return;
-    	}
-    	
-    	int averageKids = 0;
-    	int averageFights = 0;
-    	double averageKidsPerFight = 0;
-    	int averageEnergy = 0;
-    	
-    	for(Object f : fours) {
-    		Critter4 four = (Critter4) f;
-    		averageKids += four.kids;
-    		averageFights += four.fights;
-    		averageEnergy += four.getEnergy();
-    		
-    	}
-    	averageEnergy /= fours.size();
-    	averageKids /= fours.size();
-    	averageFights /= fours.size();
-    	averageKidsPerFight = averageKids/((double)averageFights);
-    	
-    	System.out.println(fours.size() + " total Critter4s birthing babies\taverage #kids: " + averageKids + "\taverage #fights: "+averageFights + "\taverage kids per fight: "+ averageKidsPerFight + "\taverage energy: "+averageEnergy);
+    public static String runStats(java.util.List<Critter> fours) {                                                      //
+        if(fours.size() == 0) {
+            //System.out.println("0 total Critter4s");
+            return "0 total Critter4s";
+        }
+
+        int averageKids = 0;
+        int averageFights = 0;
+        double averageKidsPerFight = 0;
+        int averageEnergy = 0;
+
+        for(Object f : fours) {
+            Critter4 four = (Critter4) f;
+            averageKids += four.kids;
+            averageFights += four.fights;
+            averageEnergy += four.getEnergy();
+
+        }
+        averageEnergy /= fours.size();
+        averageKids /= fours.size();
+        averageFights /= fours.size();
+        averageKidsPerFight = averageKids/((double)averageFights);
+
+        //System.out.println(fours.size() + " total Critter4s birthing babies\taverage #kids: " + averageKids + "\taverage #fights: "+averageFights + "\taverage kids per fight: "+ averageKidsPerFight + "\taverage energy: "+averageEnergy);
+        return (fours.size() + " total Critter4s birthing babies\taverage #kids: " + averageKids + "\taverage #fights: "+averageFights + "\taverage kids per fight: "+ averageKidsPerFight + "\taverage energy: "+averageEnergy);
     }
 
 	@Override
 	public CritterShape viewShape() {
-		// TODO Auto-generated method stub
-		return null;
+		return CritterShape.DIAMOND;
 	}
 }

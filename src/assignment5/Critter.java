@@ -14,6 +14,7 @@ package assignment5;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javafx.geometry.Dimension2D;
 import javafx.scene.Node;
@@ -55,7 +56,8 @@ public abstract class Critter {
 	private static String myPackage;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
-    // Indicates whether a Critter has moved during the current time step
+    
+	// Indicates whether a Critter has moved during the current time step
     private boolean hasMoved = false;
     // Indicates whether a Critter is moving to flee from a fight
     protected boolean tryingToFlee = false;
@@ -411,12 +413,14 @@ public abstract class Critter {
 	    			}
 	    			switch(viewShape) {
 						case CIRCLE:
+							gc.setLineWidth(gc.getLineWidth()*.7);
 							gc.fillOval(0, 0, width, height);
 							gc.strokeOval(0, 0, width, height);
 							break;
 						case DIAMOND:
 							double xPoints[] = {0, width/2.0, width, width/2.0};
 							double yPoints[] = {height/2.0, 0, height/2.0, height};
+							gc.setLineWidth(gc.getLineWidth()*.5);
 							gc.fillPolygon(xPoints, yPoints, 4);
 							gc.strokePolygon(xPoints, yPoints, 4);
 							break;
@@ -425,11 +429,16 @@ public abstract class Critter {
 							gc.strokeRect(0, 0, width, height);
 							break;
 						case STAR:
-							//TODO star
+							double xPoints3[] = {0, 0.3*width, 0.2*width, 0.5*width, 0.8*width, 0.7*width, width, 0.6*width, 0.5*width, 0.4*width};
+                            double yPoints3[] = {0.4*height, 0.6*height, height, 0.75*height, height, 0.6*height, 0.4*height, 0.4*height, 0, 0.4*height};
+                            gc.setLineWidth(gc.getLineWidth()*.3);
+                            gc.fillPolygon(xPoints3, yPoints3, 10);
+                            gc.strokePolygon(xPoints3, yPoints3, 10);
 							break;
 						case TRIANGLE:
 							double xPoints2[] = {0, width/2.0, width};
 							double yPoints2[] = {height, 0, height};
+							gc.setLineWidth(gc.getLineWidth()*.5);
 							gc.fillPolygon(xPoints2, yPoints2, 3);
 							gc.strokePolygon(xPoints2, yPoints2, 3);
 							break;
@@ -517,7 +526,12 @@ public abstract class Critter {
             if(myWorld[y][x] == null){
                 myWorld[y][x] = new ArrayList<Critter>();
             }
-            myWorld[y][x].add(0, critter);
+            if(critter_class_name.equals("assignment5.Algae")) {
+            	myWorld[y][x].add(critter);
+            }else {
+            	myWorld[y][x].add(0, critter);
+            }
+            
         } catch(Exception e) {
             throw new InvalidCritterException(critter_class_name);
         }
@@ -552,8 +566,9 @@ public abstract class Critter {
      * Prints out how many Critters of each type there are on the board.
      * @param critters List of Critters.
      */
-    public static void runStats(List<Critter> critters) {
-        System.out.print("" + critters.size() + " critters as follows -- ");
+    public static String runStats(List<Critter> critters) {                                                             //
+        //System.out.print("" + critters.size() + " critters as follows -- ");
+        String string = "" + critters.size() + " critters as follows -- ";
         java.util.Map<String, Integer> critter_count = new java.util.HashMap<String, Integer>();
         for (Critter crit : critters) {
             String crit_string = crit.toString();
@@ -566,12 +581,21 @@ public abstract class Critter {
         }
         String prefix = "";
         for (String s : critter_count.keySet()) {
-            System.out.print(prefix + s + ":" + critter_count.get(s));
+            //System.out.print(prefix + s + ":" + critter_count.get(s));
+            string += prefix + s + ":" + critter_count.get(s);
             prefix = ", ";
         }
-        System.out.println();
+        //System.out.println();
+        return string;
     }
 
+    
+    public static String getWhichCrittersAreAlive() {
+        
+    	
+    	return "";
+    }
+    
     /* the TestCritter class allows some critters to "cheat". If you want to
      * create tests of your Critter model, you can create subclasses of this class
      * and then use the setter functions contained here.
